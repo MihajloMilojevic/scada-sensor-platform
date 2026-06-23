@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consensus-service
+  namespace: scada
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consensus-service
+  template:
+    metadata:
+      labels:
+        app: consensus-service
+    spec:
+      containers:
+        - name: consensus-service
+          image: scada/consensus-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ConnectionStrings__Postgres
+              value: "Host=postgres-consensus;Database=consensus;Username=postgres;Password=$(POSTGRES_PASSWORD)"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: scada-secrets
+                  key: postgres-password
+            - name: Kafka__BootstrapServers
+              value: "kafka:9092"
+            - name: Jwt__Key
+              valueFrom:
+                secretKeyRef:
+                  name: scada-secrets
+                  key: jwt-key
+            - name: Jwt__Issuer
+              value: "scada-auth-service"
+            - name: Jwt__Audience
+              value: "scada-platform"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-consensus
+  namespace: scada
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-consensus
+  template:
+    metadata:
+      labels:
+        app: postgres-consensus
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+            - name: POSTGRES_DB
+              value: consensus
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: scada-secrets
+                  key: postgres-password
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: [pg_isready, -U, postgres]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: postgres-consensus-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-consensus-pvc
+  namespace: scada
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi

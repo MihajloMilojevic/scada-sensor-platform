@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+  namespace: scada
+spec:
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: disabled

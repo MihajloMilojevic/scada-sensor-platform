@@ -1,0 +1,5 @@
+services:
+  sensor-simulator-04:
+    environment:
+      - Sensor__ValueMin=750
+      - Sensor__ValueMax=900

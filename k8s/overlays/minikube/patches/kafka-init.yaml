@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+  namespace: scada
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: kafka-format
+          image: confluentinc/cp-kafka:7.6.0
+          command:
+            - sh
+            - -c
+            - >-
+              if [ ! -f /var/lib/kafka/data/meta.properties ]; then
+                printf 'node.id=1\nprocess.roles=broker,controller\ncontroller.quorum.voters=1@localhost:9093\nlisteners=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093\ninter.broker.listener.name=PLAINTEXT\nadvertised.listeners=PLAINTEXT://kafka:9092\ncontroller.listener.names=CONTROLLER\nlistener.security.protocol.map=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT\nlog.dirs=/var/lib/kafka/data\n' > /tmp/kfmt.properties &&
+                kafka-storage format -t MkU3OEVBNTcwNTJENDM2Qk -c /tmp/kfmt.properties --ignore-formatted;
+              else
+                echo "Already formatted.";
+              fi
+          env:
+            - name: KAFKA_NODE_ID
+              value: "1"
+            - name: KAFKA_PROCESS_ROLES
+              value: "broker,controller"
+            - name: KAFKA_LISTENERS
+              value: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://kafka:9092"
+            - name: KAFKA_CONTROLLER_QUORUM_VOTERS
+              value: "1@localhost:9093"
+            - name: KAFKA_CONTROLLER_LISTENER_NAMES
+              value: "CONTROLLER"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "1"
+            - name: CLUSTER_ID
+              value: "MkU3OEVBNTcwNTJENDM2Qk"
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /var/lib/kafka/data
+      containers:
+        - name: kafka
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - kafka-broker-api-versions --bootstrap-server localhost:9092
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 5

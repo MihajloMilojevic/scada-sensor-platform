@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+  - ../../base
+
+patches:
+  - path: patches/gateway-nodeport.yaml
+  - path: patches/frontend-nodeport.yaml
+  - path: patches/resources-small.yaml
+  - path: patches/image-pull-never.yaml
+  - path: patches/db-connections.yaml
+  - path: patches/kafka-no-linkerd.yaml
+  - path: patches/gateway-probe.yaml
+
+images:
+  - name: scada/auth-service
+    newTag: latest
+  - name: scada/api-gateway
+    newTag: latest
+  - name: scada/ingestion-service
+    newTag: latest
+  - name: scada/consensus-service
+    newTag: latest
+  - name: scada/sensormgmt-service
+    newTag: latest
+  - name: scada/notification-service
+    newTag: latest
+  - name: scada/analytics-service
+    newTag: latest
+  - name: scada/frontend
+    newTag: latest

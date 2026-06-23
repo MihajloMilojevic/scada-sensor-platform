@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sensormgmt-service
+  namespace: scada
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sensormgmt-service
+  template:
+    metadata:
+      labels:
+        app: sensormgmt-service
+    spec:
+      containers:
+        - name: sensormgmt-service
+          image: scada/sensormgmt-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ConnectionStrings__Postgres
+              value: "Host=postgres-sensormgmt;Database=sensormgmt;Username=postgres;Password=$(POSTGRES_PASSWORD)"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: scada-secrets
+                  key: postgres-password
+            - name: ConnectionStrings__Redis
+              value: "redis-sensormgmt:6379"
+            - name: Kafka__BootstrapServers
+              value: "kafka:9092"
+            - name: Jwt__Key
+              valueFrom:
+                secretKeyRef:
+                  name: scada-secrets
+                  key: jwt-key
+            - name: Jwt__Issuer
+              value: "scada-auth-service"
+            - name: Jwt__Audience
+              value: "scada-platform"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-sensormgmt
+  namespace: scada
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-sensormgmt
+  template:
+    metadata:
+      labels:
+        app: postgres-sensormgmt
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+            - name: POSTGRES_DB
+              value: sensormgmt
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: scada-secrets
+                  key: postgres-password
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: [pg_isready, -U, postgres]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: postgres-sensormgmt-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-sensormgmt-pvc
+  namespace: scada
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-sensormgmt
+  namespace: scada
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-sensormgmt
+  template:
+    metadata:
+      labels:
+        app: redis-sensormgmt
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          readinessProbe:
+            exec:
+              command: [redis-cli, ping]
+            initialDelaySeconds: 5
+            periodSeconds: 5

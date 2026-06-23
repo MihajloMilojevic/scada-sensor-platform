@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: scada
+spec:
+  template:
+    spec:
+      containers:
+        - name: auth-service
+          env:
+            - name: ConnectionStrings__Postgres
+              value: "Host=postgres-auth;Database=auth;Username=postgres;Password=postgres"
+            - name: ConnectionStrings__Redis
+              value: "redis-auth:6379"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consensus-service
+  namespace: scada
+spec:
+  template:
+    spec:
+      containers:
+        - name: consensus-service
+          env:
+            - name: ConnectionStrings__Postgres
+              value: "Host=postgres-consensus;Database=consensus;Username=postgres;Password=postgres"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sensormgmt-service
+  namespace: scada
+spec:
+  template:
+    spec:
+      containers:
+        - name: sensormgmt-service
+          env:
+            - name: ConnectionStrings__Postgres
+              value: "Host=postgres-sensormgmt;Database=sensormgmt;Username=postgres;Password=postgres"
+            - name: ConnectionStrings__Redis
+              value: "redis-sensormgmt:6379"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-service
+  namespace: scada
+spec:
+  template:
+    spec:
+      containers:
+        - name: analytics-service
+          env:
+            - name: ConnectionStrings__Postgres
+              value: "Host=postgres-analytics;Database=analytics;Username=postgres;Password=postgres"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: scada
+spec:
+  template:
+    spec:
+      containers:
+        - name: api-gateway
+          env:
+            - name: ConnectionStrings__Redis
+              value: "redis-gateway:6379"

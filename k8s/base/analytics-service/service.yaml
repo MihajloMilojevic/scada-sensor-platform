@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-service
+  namespace: scada
+spec:
+  selector:
+    app: analytics-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-analytics
+  namespace: scada
+spec:
+  selector:
+    app: postgres-analytics
+  ports:
+    - port: 5432
+      targetPort: 5432

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: scada
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: scada/api-gateway:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: Jwt__Key
+              valueFrom:
+                secretKeyRef:
+                  name: scada-secrets
+                  key: jwt-key
+            - name: Jwt__Issuer
+              value: "scada-auth-service"
+            - name: Jwt__Audience
+              value: "scada-platform"
+            - name: ConnectionStrings__Redis
+              value: "redis-gateway:6379"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-gateway
+  namespace: scada
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-gateway
+  template:
+    metadata:
+      labels:
+        app: redis-gateway
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          readinessProbe:
+            exec:
+              command: [redis-cli, ping]
+            initialDelaySeconds: 5
+            periodSeconds: 5

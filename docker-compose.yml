@@ -1,0 +1,418 @@
+services:
+
+  # ── Kafka (KRaft, no ZooKeeper) ──────────────────────────────────────────────
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # ── InfluxDB — Ingestion Service ──────────────────────────────────────────────
+  influxdb-ingestion:
+    image: influxdb:2.7
+    container_name: influxdb-ingestion
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: admin1234
+      DOCKER_INFLUXDB_INIT_ORG: scada
+      DOCKER_INFLUXDB_INIT_BUCKET: sensor-data
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: scada-influx-token
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-ingestion-data:/var/lib/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # ── PostgreSQL — Consensus Service ────────────────────────────────────────────
+  postgres-consensus:
+    image: postgres:16
+    container_name: postgres-consensus
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: consensus
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-consensus-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d consensus"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── PostgreSQL — Sensor Management Service ────────────────────────────────────
+  postgres-sensormgmt:
+    image: postgres:16
+    container_name: postgres-sensormgmt
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sensormgmt
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-sensormgmt-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sensormgmt"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Redis — Sensor Management heartbeat TTL ───────────────────────────────────
+  redis-sensormgmt:
+    image: redis:7
+    container_name: redis-sensormgmt
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-sensormgmt-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── PostgreSQL — Auth Service ─────────────────────────────────────────────────
+  postgres-auth:
+    image: postgres:16
+    container_name: postgres-auth
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-auth-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Redis — Auth refresh tokens ───────────────────────────────────────────────
+  redis-auth:
+    image: redis:7
+    container_name: redis-auth
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis-auth-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── PostgreSQL — Analytics Service ───────────────────────────────────────────
+  postgres-analytics:
+    image: postgres:16
+    container_name: postgres-analytics
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: analytics
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres-analytics-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d analytics"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Redis — API Gateway token cache ──────────────────────────────────────────
+  redis-gateway:
+    image: redis:7
+    container_name: redis-gateway
+    ports:
+      - "6382:6379"
+    volumes:
+      - redis-gateway-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── Application Services ──────────────────────────────────────────────────────
+  auth-service:
+    build:
+      context: .
+      dockerfile: src/AuthService/Dockerfile
+    container_name: auth-service
+    depends_on:
+      postgres-auth:
+        condition: service_healthy
+      redis-auth:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__Postgres=Host=postgres-auth;Database=auth;Username=postgres;Password=postgres
+      - ConnectionStrings__Redis=redis-auth:6379
+      - Jwt__Key=scada-jwt-dev-secret-key-must-be-at-least-32-bytes-long!
+      - Jwt__Issuer=scada-auth-service
+      - Jwt__Audience=scada-platform
+
+  sensormgmt-service:
+    build:
+      context: .
+      dockerfile: src/SensorManagementService/Dockerfile
+    container_name: sensormgmt-service
+    depends_on:
+      postgres-sensormgmt:
+        condition: service_healthy
+      redis-sensormgmt:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__Postgres=Host=postgres-sensormgmt;Database=sensormgmt;Username=postgres;Password=postgres
+      - ConnectionStrings__Redis=redis-sensormgmt:6379
+      - Jwt__Key=scada-jwt-dev-secret-key-must-be-at-least-32-bytes-long!
+      - Jwt__Issuer=scada-auth-service
+      - Jwt__Audience=scada-platform
+      - Kafka__BootstrapServers=kafka:9092
+      - Heartbeat__TtlSeconds=12
+
+  ingestion-service:
+    build:
+      context: .
+      dockerfile: src/IngestionService/Dockerfile
+    container_name: ingestion-service
+    depends_on:
+      kafka:
+        condition: service_healthy
+      influxdb-ingestion:
+        condition: service_healthy
+    volumes:
+      - ingestion-wal:/data/wal
+    environment:
+      - Jwt__Key=scada-jwt-dev-secret-key-must-be-at-least-32-bytes-long!
+      - Jwt__Issuer=scada-auth-service
+      - Jwt__Audience=scada-platform
+      - Security__AesKey=Yl+vBqkPaMnqOoyFWsrSMze/2W1srfEXvXPSD7SrSJk=
+      - Security__EcdsaPublicKey=MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAErpKN2xBlXX+OSAP+PVE9BdSuY50HUTPzKfJt0DfvC+J1BetTB5NNmP5ryYC7iU2VXUs6phxEM/1lkZDtjoBQFw==
+      - InfluxDB__Url=http://influxdb-ingestion:8086
+      - InfluxDB__Token=scada-influx-token
+      - InfluxDB__Org=scada
+      - InfluxDB__Bucket=sensor-data
+      - Kafka__BootstrapServers=kafka:9092
+      - Flush__MaxBatchSize=100
+      - Flush__MaxBatchAgeSeconds=5
+      - Wal__Directory=/data/wal
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: src/AnalyticsService/Dockerfile
+    container_name: analytics-service
+    depends_on:
+      postgres-analytics:
+        condition: service_healthy
+      ingestion-service:
+        condition: service_started
+      consensus-service:
+        condition: service_started
+      sensormgmt-service:
+        condition: service_started
+    environment:
+      - ConnectionStrings__Postgres=Host=postgres-analytics;Database=analytics;Username=postgres;Password=postgres
+      - Jwt__Key=scada-jwt-dev-secret-key-must-be-at-least-32-bytes-long!
+      - Jwt__Issuer=scada-auth-service
+      - Jwt__Audience=scada-platform
+      - Services__Ingestion=http://ingestion-service:8080
+      - Services__Consensus=http://consensus-service:8080
+      - Services__SensorMgmt=http://sensormgmt-service:8080
+      - Cache__TtlSeconds=30
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: src/NotificationService/Dockerfile
+    container_name: notification-service
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      - Jwt__Key=scada-jwt-dev-secret-key-must-be-at-least-32-bytes-long!
+      - Jwt__Issuer=scada-auth-service
+      - Jwt__Audience=scada-platform
+      - Kafka__BootstrapServers=kafka:9092
+
+  consensus-service:
+    build:
+      context: .
+      dockerfile: src/ConsensusService/Dockerfile
+    container_name: consensus-service
+    depends_on:
+      postgres-consensus:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__Postgres=Host=postgres-consensus;Database=consensus;Username=postgres;Password=postgres
+      - Jwt__Key=scada-jwt-dev-secret-key-must-be-at-least-32-bytes-long!
+      - Jwt__Issuer=scada-auth-service
+      - Jwt__Audience=scada-platform
+      - Kafka__BootstrapServers=kafka:9092
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: src/ApiGateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - redis-gateway
+      - sensormgmt-service
+      - ingestion-service
+      - consensus-service
+      - notification-service
+      - analytics-service
+    environment:
+      - ConnectionStrings__Redis=redis-gateway:6379
+      - AuthService__BaseUrl=http://auth-service:8080
+
+  sensor-simulator:
+    build:
+      context: .
+      dockerfile: src/SensorSimulator/Dockerfile
+    container_name: sensor-simulator-01
+    depends_on:
+      - api-gateway
+      - sensormgmt-service
+    environment:
+      - GatewayUrl=http://api-gateway:8080
+      - Auth__AdminUsername=admin
+      - Auth__AdminPassword=admin123
+      - Security__AesKey=Yl+vBqkPaMnqOoyFWsrSMze/2W1srfEXvXPSD7SrSJk=
+      - Security__EcdsaPrivateKey=MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgJn8OTamdhmY1rCz730gotfNAGR2dT80DV3M+sKUzfEyhRANCAASuko3bEGVdf45IA/49UT0F1K5jnQdRM/Mp8m3QN+8L4nUF61MHk02Y/mvJgLuJTZVdSzqmHEQz/WWRkO2OgFAX
+      - Sensor__SensorId=sensor-01
+      - Sensor__ValueMin=250
+      - Sensor__ValueMax=400
+      - Sensor__AlarmP1Threshold=350
+      - Sensor__AlarmP2Threshold=370
+      - Sensor__AlarmP3Threshold=390
+
+  sensor-simulator-02:
+    build:
+      context: .
+      dockerfile: src/SensorSimulator/Dockerfile
+    container_name: sensor-simulator-02
+    depends_on:
+      - api-gateway
+    environment:
+      - GatewayUrl=http://api-gateway:8080
+      - Auth__AdminUsername=admin
+      - Auth__AdminPassword=admin123
+      - Security__AesKey=Yl+vBqkPaMnqOoyFWsrSMze/2W1srfEXvXPSD7SrSJk=
+      - Security__EcdsaPrivateKey=MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgJn8OTamdhmY1rCz730gotfNAGR2dT80DV3M+sKUzfEyhRANCAASuko3bEGVdf45IA/49UT0F1K5jnQdRM/Mp8m3QN+8L4nUF61MHk02Y/mvJgLuJTZVdSzqmHEQz/WWRkO2OgFAX
+      - Sensor__SensorId=sensor-02
+      - Sensor__ValueMin=250
+      - Sensor__ValueMax=400
+      - Sensor__AlarmP1Threshold=350
+      - Sensor__AlarmP2Threshold=370
+      - Sensor__AlarmP3Threshold=390
+
+  sensor-simulator-03:
+    build:
+      context: .
+      dockerfile: src/SensorSimulator/Dockerfile
+    container_name: sensor-simulator-03
+    depends_on:
+      - api-gateway
+    environment:
+      - GatewayUrl=http://api-gateway:8080
+      - Auth__AdminUsername=admin
+      - Auth__AdminPassword=admin123
+      - Security__AesKey=Yl+vBqkPaMnqOoyFWsrSMze/2W1srfEXvXPSD7SrSJk=
+      - Security__EcdsaPrivateKey=MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgJn8OTamdhmY1rCz730gotfNAGR2dT80DV3M+sKUzfEyhRANCAASuko3bEGVdf45IA/49UT0F1K5jnQdRM/Mp8m3QN+8L4nUF61MHk02Y/mvJgLuJTZVdSzqmHEQz/WWRkO2OgFAX
+      - Sensor__SensorId=sensor-03
+      - Sensor__ValueMin=250
+      - Sensor__ValueMax=400
+      - Sensor__AlarmP1Threshold=350
+      - Sensor__AlarmP2Threshold=370
+      - Sensor__AlarmP3Threshold=390
+
+  sensor-simulator-04:
+    build:
+      context: .
+      dockerfile: src/SensorSimulator/Dockerfile
+    container_name: sensor-simulator-04
+    depends_on:
+      - api-gateway
+    environment:
+      - GatewayUrl=http://api-gateway:8080
+      - Auth__AdminUsername=admin
+      - Auth__AdminPassword=admin123
+      - Security__AesKey=Yl+vBqkPaMnqOoyFWsrSMze/2W1srfEXvXPSD7SrSJk=
+      - Security__EcdsaPrivateKey=MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgJn8OTamdhmY1rCz730gotfNAGR2dT80DV3M+sKUzfEyhRANCAASuko3bEGVdf45IA/49UT0F1K5jnQdRM/Mp8m3QN+8L4nUF61MHk02Y/mvJgLuJTZVdSzqmHEQz/WWRkO2OgFAX
+      - Sensor__SensorId=sensor-04
+      - Sensor__ValueMin=250
+      - Sensor__ValueMax=400
+      - Sensor__AlarmP1Threshold=350
+      - Sensor__AlarmP2Threshold=370
+      - Sensor__AlarmP3Threshold=390
+
+  sensor-simulator-05:
+    build:
+      context: .
+      dockerfile: src/SensorSimulator/Dockerfile
+    container_name: sensor-simulator-05
+    depends_on:
+      - api-gateway
+    environment:
+      - GatewayUrl=http://api-gateway:8080
+      - Auth__AdminUsername=admin
+      - Auth__AdminPassword=admin123
+      - Security__AesKey=Yl+vBqkPaMnqOoyFWsrSMze/2W1srfEXvXPSD7SrSJk=
+      - Security__EcdsaPrivateKey=MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgJn8OTamdhmY1rCz730gotfNAGR2dT80DV3M+sKUzfEyhRANCAASuko3bEGVdf45IA/49UT0F1K5jnQdRM/Mp8m3QN+8L4nUF61MHk02Y/mvJgLuJTZVdSzqmHEQz/WWRkO2OgFAX
+      - Sensor__SensorId=sensor-05
+      - Sensor__ValueMin=250
+      - Sensor__ValueMax=400
+      - Sensor__AlarmP1Threshold=350
+      - Sensor__AlarmP2Threshold=370
+      - Sensor__AlarmP3Threshold=390
+
+volumes:
+  kafka-data:
+  influxdb-ingestion-data:
+  postgres-consensus-data:
+  postgres-sensormgmt-data:
+  redis-sensormgmt-data:
+  postgres-auth-data:
+  redis-auth-data:
+  postgres-analytics-data:
+  redis-gateway-data:
+  ingestion-wal:

@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AnalyticsService/AnalyticsService.csproj" />
+    <Project Path="src/ApiGateway/ApiGateway.csproj" />
+    <Project Path="src/AuthService/AuthService.csproj" />
+    <Project Path="src/ConsensusService/ConsensusService.csproj" />
+    <Project Path="src/IngestionService/IngestionService.csproj" />
+    <Project Path="src/NotificationService/NotificationService.csproj" />
+    <Project Path="src/SensorManagementService/SensorManagementService.csproj" />
+    <Project Path="src/SensorSimulator/SensorSimulator.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Scada.Shared.Contracts/Scada.Shared.Contracts.csproj" />
+    <Project Path="src/Shared/Scada.Shared.Kafka/Scada.Shared.Kafka.csproj" />
+    <Project Path="src/Shared/Scada.Shared.Security/Scada.Shared.Security.csproj" />
+  </Folder>
+</Solution>
