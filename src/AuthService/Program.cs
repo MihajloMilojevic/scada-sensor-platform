@@ -59,6 +59,19 @@ using (var scope = app.Services.CreateScope())
             await Task.Delay(3000);
         }
     }
+
+    // Seed admin korisnik ako ne postoji
+    if (!await db.Users.AnyAsync(u => u.Username == "admin"))
+    {
+        db.Users.Add(new AuthService.Models.User
+        {
+            Username = "admin",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123", 11),
+            Role = "ADMIN"
+        });
+        await db.SaveChangesAsync();
+        app.Logger.LogInformation("Seeded admin user (admin / admin123)");
+    }
 }
 
 app.UseSwagger();

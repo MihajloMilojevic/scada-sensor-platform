@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Scada.Shared.Contracts/1.0.0": {
+        "runtime": {
+          "Scada.Shared.Contracts.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Scada.Shared.Contracts/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -91,13 +91,19 @@ export class HistoryComponent implements OnInit {
     }
   }
 
+  private toLocalDateTimeString(d: Date): string {
+    // datetime-local input expects local time, not UTC
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
   private defaultFrom() {
     const d = new Date();
     d.setHours(d.getHours() - 1);
-    return d.toISOString().slice(0, 16);
+    return this.toLocalDateTimeString(d);
   }
 
   private defaultTo() {
-    return new Date().toISOString().slice(0, 16);
+    return this.toLocalDateTimeString(new Date());
   }
 }

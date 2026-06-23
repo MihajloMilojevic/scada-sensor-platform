@@ -83,6 +83,10 @@ public class AuthController(AuthDbContext db, JwtTokenService jwt, RefreshTokenS
         var accessToken = jwt.CreateSensorToken(req.SensorId);
         return Ok(new { accessToken, tokenType = "Bearer", scope = "ingest:write" });
     }
+
+    [HttpGet("health")]
+    [AllowAnonymous]
+    public IActionResult Health() => Ok(new { status = "ok", service = "AuthService" });
 }
 
 public record LoginRequest(string Username, string Password);

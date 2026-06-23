@@ -9,7 +9,9 @@ namespace SensorManagementService.Controllers;
 [ApiController]
 [Route("api/sensors")]
 [Authorize]
-public class SensorsController(SensorMgmtDbContext db, PoolManager poolManager) : ControllerBase
+public class SensorsController(
+    SensorMgmtDbContext db,
+    PoolManager poolManager) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken ct) =>
@@ -28,8 +30,9 @@ public class SensorsController(SensorMgmtDbContext db, PoolManager poolManager) 
     {
         try
         {
-            await poolManager.ManualTransitionAsync(id, "ACTIVE", "MANUAL", db, ct);
-            return Ok(new { message = $"{id} activated" });
+            await poolManager.ManualActivateAsync(id, db, ct);
+            var sensor = await db.Sensors.FindAsync([id], ct);
+            return Ok(new { message = $"{id} → {sensor?.Status}", status = sensor?.Status });
         }
         catch (KeyNotFoundException) { return NotFound(); }
     }
@@ -40,8 +43,8 @@ public class SensorsController(SensorMgmtDbContext db, PoolManager poolManager) 
     {
         try
         {
-            await poolManager.ManualTransitionAsync(id, "INACTIVE", "MANUAL", db, ct);
-            return Ok(new { message = $"{id} deactivated" });
+            await poolManager.ManualDeactivateAsync(id, db, ct);
+            return Ok(new { message = $"{id} deactivated — standby promoted automatically" });
         }
         catch (KeyNotFoundException) { return NotFound(); }
     }
@@ -53,10 +56,10 @@ public class SensorsController(SensorMgmtDbContext db, PoolManager poolManager) 
         var sensor = await db.Sensors.FindAsync([id], ct);
         if (sensor == null) return NotFound();
 
-        sensor.BlockedUntilAt = DateTimeOffset.UtcNow.AddSeconds(30);
-        sensor.UpdatedAt = DateTimeOffset.UtcNow;
-        await poolManager.ManualTransitionAsync(id, "INACTIVE", "MANUAL", db, ct);
-        return Ok(new { message = $"{id} blocked for 30s" });
+        const int blockSeconds = 30;
+        await poolManager.BlockSensorAsync(id, blockSeconds, db, ct);
+
+        return Ok(new { message = $"{id} blocked for {blockSeconds}s — will send READY when unblocked" });
     }
 
     [HttpGet("health")]

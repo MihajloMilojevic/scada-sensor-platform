@@ -44,13 +44,10 @@ public class IngestController(
     [HttpGet("measurements")]
     [Authorize]
     public async Task<IActionResult> GetMeasurements(
-        [FromQuery] string sensorId,
+        [FromQuery] string? sensorId,
         [FromQuery] DateTimeOffset? from,
         [FromQuery] DateTimeOffset? to)
     {
-        if (string.IsNullOrWhiteSpace(sensorId))
-            return BadRequest(new { error = "sensorId is required" });
-
         var start = from ?? DateTimeOffset.UtcNow.AddHours(-1);
         var end = to ?? DateTimeOffset.UtcNow;
         var results = await influx.QueryAsync(sensorId, start, end);

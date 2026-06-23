@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
-const GW = 'http://localhost:8080';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -13,7 +12,7 @@ export class AuthService {
 
   async login(username: string, password: string): Promise<void> {
     const res: any = await firstValueFrom(
-      this.http.post(`${GW}/api/auth/login`, { username, password })
+      this.http.post(`/api/auth/login`, { username, password })
     );
     localStorage.setItem('access_token', res.accessToken);
     localStorage.setItem('refresh_token', res.refreshToken);

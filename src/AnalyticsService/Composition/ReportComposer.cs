@@ -31,7 +31,7 @@ public class ReportComposer(
     {
         var qs = BuildQueryString(("sensorId", sensorId), ("from", from), ("to", to));
         return GetOrFetchAsync($"history:{qs}", () =>
-            FetchAsync($"{IngestionUrl}/api/measurements{qs}", ct), ct);
+            FetchAsync($"{IngestionUrl}/api/ingest/measurements{qs}", ct), ct);
     }
 
     public Task<object?> GetConsensusAsync(string? from, string? to, CancellationToken ct)

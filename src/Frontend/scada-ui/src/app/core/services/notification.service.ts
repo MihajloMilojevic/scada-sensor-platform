@@ -35,7 +35,7 @@ export interface QualityEvent {
   receivedAt: Date;
 }
 
-const GW_WS = 'http://localhost:8080/ws/notifications';
+const GW_WS = '/ws/notifications';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService implements OnDestroy {

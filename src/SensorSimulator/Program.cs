@@ -12,12 +12,13 @@ var config = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
-var gatewayUrl = config["GatewayUrl"] ?? "http://localhost:8080";
+var gatewayUrl    = config["GatewayUrl"]    ?? "http://localhost:8080";
+var smsUrl        = config["SmsUrl"]        ?? "http://localhost:8081"; // SensorManagementService direktno
 var adminUsername = config["Auth:AdminUsername"] ?? "admin";
 var adminPassword = config["Auth:AdminPassword"] ?? "admin123";
-var aesKey = config["Security:AesKey"]
+var aesKey        = config["Security:AesKey"]
     ?? throw new InvalidOperationException("Security:AesKey required");
-var ecPrivateKey = config["Security:EcdsaPrivateKey"]
+var ecPrivateKey  = config["Security:EcdsaPrivateKey"]
     ?? throw new InvalidOperationException("Security:EcdsaPrivateKey required");
 
 var sensorCfg = new SensorConfig();
@@ -47,7 +48,7 @@ if (string.IsNullOrWhiteSpace(sensorToken))
         }
     }
     if (loginResp == null || !loginResp.IsSuccessStatusCode)
-        throw new InvalidOperationException("Login failed — check Auth:AdminUsername/Password in config");
+        throw new InvalidOperationException("Login failed");
 
     var loginJson = await loginResp.Content.ReadFromJsonAsync<JsonElement>();
     var accessToken = loginJson.GetProperty("accessToken").GetString()!;
@@ -68,18 +69,30 @@ if (string.IsNullOrWhiteSpace(sensorToken))
 http.DefaultRequestHeaders.Authorization =
     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", sensorToken);
 
-// ── Simulation loop ───────────────────────────────────────────────────────────
-var rng = new Random();
-long messageId = DateTimeOffset.UtcNow.ToUnixTimeSeconds(); // start unique per run
+// ── Konektuj se na SMS command hub ───────────────────────────────────────────
+await using var commandListener = new SensorCommandListener(smsUrl, sensorCfg.SensorId, sensorToken);
 using var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (_, e) => { e.Cancel = true; cts.Cancel(); };
+
+await commandListener.StartAsync(cts.Token);
+
+// ── Simulation loop ───────────────────────────────────────────────────────────
+var rng = new Random();
+long messageId = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
 Console.WriteLine($"Starting sensor simulation: {sensorCfg.SensorId} range=[{sensorCfg.ValueMin},{sensorCfg.ValueMax}]");
 
 while (!cts.IsCancellationRequested)
 {
-    var delayMs = rng.Next(1000, 5001); // 1–5 seconds
+    // Čekaj ako je STOP ili BLOCK aktivan
+    try { await commandListener.WaitIfPausedAsync(cts.Token); }
+    catch (OperationCanceledException) { break; }
+
+    var delayMs = rng.Next(1000, 5001);
     try { await Task.Delay(delayMs, cts.Token); } catch (OperationCanceledException) { break; }
+
+    // Provjeri ponovo nakon delay-a (mogao je stići STOP tokom delay-a)
+    if (!commandListener.IsRunning) continue;
 
     var value = sensorCfg.ValueMin + rng.NextDouble() * (sensorCfg.ValueMax - sensorCfg.ValueMin);
     var alarmPriority = sensorCfg.GetAlarmPriority(value);

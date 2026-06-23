@@ -1,0 +1,12 @@
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/bin/Debug/net8.0/Scada.Shared.Security.deps.json
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/bin/Debug/net8.0/Scada.Shared.Security.dll
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/bin/Debug/net8.0/Scada.Shared.Security.pdb
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/obj/Debug/net8.0/Scada.Shared.Security.GeneratedMSBuildEditorConfig.editorconfig
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/obj/Debug/net8.0/Scada.Shared.Security.AssemblyInfoInputs.cache
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/obj/Debug/net8.0/Scada.Shared.Security.AssemblyInfo.cs
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/obj/Debug/net8.0/Scada.Shared.Security.csproj.CoreCompileInputs.cache
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/obj/Debug/net8.0/Scada.Shared.Security.sourcelink.json
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/obj/Debug/net8.0/Scada.Shared.Security.dll
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/obj/Debug/net8.0/refint/Scada.Shared.Security.dll
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/obj/Debug/net8.0/Scada.Shared.Security.pdb
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Security/obj/Debug/net8.0/ref/Scada.Shared.Security.dll

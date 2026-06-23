@@ -59,7 +59,8 @@
               "buildTarget": "scada-ui:build:production"
             },
             "development": {
-              "buildTarget": "scada-ui:build:development"
+              "buildTarget": "scada-ui:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

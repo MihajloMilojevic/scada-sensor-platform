@@ -9,11 +9,13 @@ spec:
       containers:
         - name: api-gateway
           readinessProbe:
+            httpGet: null
             tcpSocket:
               port: 8080
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
+            httpGet: null
             tcpSocket:
               port: 8080
             initialDelaySeconds: 30

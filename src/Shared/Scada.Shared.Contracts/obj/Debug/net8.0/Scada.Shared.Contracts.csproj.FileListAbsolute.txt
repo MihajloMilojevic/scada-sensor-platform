@@ -1,0 +1,12 @@
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/bin/Debug/net8.0/Scada.Shared.Contracts.deps.json
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/bin/Debug/net8.0/Scada.Shared.Contracts.dll
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/bin/Debug/net8.0/Scada.Shared.Contracts.pdb
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/obj/Debug/net8.0/Scada.Shared.Contracts.GeneratedMSBuildEditorConfig.editorconfig
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/obj/Debug/net8.0/Scada.Shared.Contracts.AssemblyInfoInputs.cache
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/obj/Debug/net8.0/Scada.Shared.Contracts.AssemblyInfo.cs
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/obj/Debug/net8.0/Scada.Shared.Contracts.csproj.CoreCompileInputs.cache
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/obj/Debug/net8.0/Scada.Shared.Contracts.sourcelink.json
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/obj/Debug/net8.0/Scada.Shared.Contracts.dll
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/obj/Debug/net8.0/refint/Scada.Shared.Contracts.dll
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/obj/Debug/net8.0/Scada.Shared.Contracts.pdb
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/obj/Debug/net8.0/ref/Scada.Shared.Contracts.dll

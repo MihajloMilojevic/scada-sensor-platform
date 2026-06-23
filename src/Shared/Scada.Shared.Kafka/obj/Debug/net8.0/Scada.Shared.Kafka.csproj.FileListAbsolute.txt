@@ -1,0 +1,13 @@
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/bin/Debug/net8.0/Scada.Shared.Kafka.deps.json
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/bin/Debug/net8.0/Scada.Shared.Kafka.dll
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/bin/Debug/net8.0/Scada.Shared.Kafka.pdb
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/obj/Debug/net8.0/Scada.Shared.Kafka.csproj.AssemblyReference.cache
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/obj/Debug/net8.0/Scada.Shared.Kafka.GeneratedMSBuildEditorConfig.editorconfig
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/obj/Debug/net8.0/Scada.Shared.Kafka.AssemblyInfoInputs.cache
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/obj/Debug/net8.0/Scada.Shared.Kafka.AssemblyInfo.cs
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/obj/Debug/net8.0/Scada.Shared.Kafka.csproj.CoreCompileInputs.cache
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/obj/Debug/net8.0/Scada.Shared.Kafka.sourcelink.json
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/obj/Debug/net8.0/Scada.Shared.Kafka.dll
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/obj/Debug/net8.0/refint/Scada.Shared.Kafka.dll
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/obj/Debug/net8.0/Scada.Shared.Kafka.pdb
+/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/obj/Debug/net8.0/ref/Scada.Shared.Kafka.dll

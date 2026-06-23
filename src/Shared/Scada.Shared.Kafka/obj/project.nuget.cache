@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "r245racMKQY=",
+  "success": true,
+  "projectFilePath": "/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Kafka/Scada.Shared.Kafka.csproj",
+  "expectedPackageFiles": [
+    "/home/mihajlo/.nuget/packages/confluent.kafka/2.6.0/confluent.kafka.2.6.0.nupkg.sha512",
+    "/home/mihajlo/.nuget/packages/librdkafka.redist/2.6.0/librdkafka.redist.2.6.0.nupkg.sha512",
+    "/home/mihajlo/.nuget/packages/system.memory/4.5.0/system.memory.4.5.0.nupkg.sha512",
+    "/home/mihajlo/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.27/microsoft.aspnetcore.app.ref.8.0.27.nupkg.sha512"
+  ],
+  "logs": []
+}

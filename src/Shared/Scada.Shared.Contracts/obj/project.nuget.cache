@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "G+9+qKQa0xc=",
+  "success": true,
+  "projectFilePath": "/home/mihajlo/Mihajlo/Projekti/snus proj/src/Shared/Scada.Shared.Contracts/Scada.Shared.Contracts.csproj",
+  "expectedPackageFiles": [
+    "/home/mihajlo/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.27/microsoft.aspnetcore.app.ref.8.0.27.nupkg.sha512"
+  ],
+  "logs": []
+}

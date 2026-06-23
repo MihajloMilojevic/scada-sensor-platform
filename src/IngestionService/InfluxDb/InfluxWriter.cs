@@ -31,17 +31,21 @@ public class InfluxWriter(IConfiguration config, ILogger<InfluxWriter> logger)
     }
 
     public async Task<List<SensorDataMessage>> QueryAsync(
-        string sensorId, DateTimeOffset from, DateTimeOffset to, CancellationToken ct = default)
+        string? sensorId, DateTimeOffset from, DateTimeOffset to, CancellationToken ct = default)
     {
         using var client = new InfluxDBClient(_url, _token);
         var queryApi = client.GetQueryApi();
 
-        var flux = $"""
-            from(bucket: "{_bucket}")
-              |> range(start: {from:O}, stop: {to:O})
-              |> filter(fn: (r) => r._measurement == "temperature" and r["sensorId"] == "{sensorId}")
-              |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-            """;
+        var sensorFilter = string.IsNullOrWhiteSpace(sensorId)
+            ? ""
+            : $"  |> filter(fn: (r) => r[\"sensorId\"] == \"{sensorId}\")\n";
+
+        var flux =
+            $"from(bucket: \"{_bucket}\")\n" +
+            $"  |> range(start: {from:O}, stop: {to:O})\n" +
+            $"  |> filter(fn: (r) => r._measurement == \"temperature\")\n" +
+            sensorFilter +
+            $"  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")";
 
         var tables = await queryApi.QueryAsync(flux, _org, ct);
         var results = new List<SensorDataMessage>();
@@ -53,7 +57,7 @@ public class InfluxWriter(IConfiguration config, ILogger<InfluxWriter> logger)
                 var time = record.GetTime()?.ToDateTimeOffset() ?? DateTimeOffset.UtcNow;
                 results.Add(new SensorDataMessage
                 {
-                    SensorId = record.GetValueByKey("sensorId")?.ToString() ?? sensorId,
+                    SensorId = record.GetValueByKey("sensorId")?.ToString() ?? sensorId ?? "",
                     Value = Convert.ToDouble(record.GetValueByKey("value") ?? 0),
                     Timestamp = time,
                     AlarmPriority = Convert.ToInt32(record.GetValueByKey("alarmPriority") ?? 0),
