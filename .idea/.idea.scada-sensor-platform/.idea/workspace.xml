@@ -26,29 +26,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a62a6c1d-27ee-4655-8d42-970bd8ae440b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Frontend/scada-ui/proxy.conf.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.scada-sensor-platform/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.scada-sensor-platform/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/k8s/overlays/minikube/patches/gateway-probe.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/overlays/minikube/patches/gateway-probe.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AnalyticsService/Composition/ReportComposer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/AnalyticsService/Composition/ReportComposer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AuthService/Controllers/AuthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/AuthService/Controllers/AuthController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AuthService/Data/AuthDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/AuthService/Data/AuthDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AuthService/Models/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/AuthService/Models/User.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AuthService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/AuthService/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Frontend/scada-ui/angular.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Frontend/scada-ui/angular.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Frontend/scada-ui/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Frontend/scada-ui/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Frontend/scada-ui/src/app/core/services/analytics-api.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Frontend/scada-ui/src/app/core/services/analytics-api.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Frontend/scada-ui/src/app/core/services/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Frontend/scada-ui/src/app/core/services/auth.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Frontend/scada-ui/src/app/core/services/notification.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Frontend/scada-ui/src/app/core/services/notification.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Frontend/scada-ui/src/app/core/services/sensor-api.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Frontend/scada-ui/src/app/core/services/sensor-api.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Frontend/scada-ui/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Frontend/scada-ui/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Frontend/scada-ui/src/app/features/history/history.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Frontend/scada-ui/src/app/features/history/history.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/IngestionService/Controllers/IngestController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/IngestionService/Controllers/IngestController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/IngestionService/InfluxDb/InfluxWriter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/IngestionService/InfluxDb/InfluxWriter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SensorManagementService/Controllers/SensorsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/SensorManagementService/Controllers/SensorsController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SensorManagementService/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/SensorManagementService/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SensorManagementService/Services/PoolManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/SensorManagementService/Services/PoolManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SensorSimulator/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/SensorSimulator/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SensorSimulator/SensorSimulator.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/SensorSimulator/SensorSimulator.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,6 +61,7 @@
     <setting file="file://$PROJECT_DIR$/src/Frontend/scada-ui/package.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Frontend/scada-ui/proxy.conf.json" root0="FORCE_HIGHLIGHTING" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7,
   &quot;fromUser&quot;: false
@@ -103,12 +84,13 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHELLCHECK.PATH": "/home/mihajlo/.local/share/JetBrains/Rider2026.1/Shell Script/shellcheck",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "main",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.lookFeel",
-    "ts.external.directory.path": "/home/mihajlo/.local/share/JetBrains/Toolbox/apps/rider/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "ts.external.directory.path": "/home/mihajlo/Mihajlo/Projekti/snus proj/src/Frontend/scada-ui/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -462,16 +444,28 @@
       <option name="presentableId" value="Default" />
       <updated>1781696834857</updated>
       <workItem from="1781696839579" duration="6130000" />
-      <workItem from="1782248241898" duration="9688000" />
+      <workItem from="1782248241898" duration="10935000" />
     </task>
+    <task id="LOCAL-00001" summary="works">
+      <option name="closed" value="true" />
+      <created>1782258598628</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1782258598628</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="works" />
+    <option name="LAST_COMMIT_MESSAGE" value="works" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
